@@ -19,7 +19,7 @@ A production-quality, private subscription tracker built with Next.js 16 App Rou
 - **Dark/light mode** — grain-textured warm palette
 - **Secure** — JWT auth, all secrets server-side only, bcrypt password hashing
 - **Payment urgency** — color-coded indicators (red ≤3d, yellow ≤7d, green >7d)
-- **Email alerts** — automated email notifications before upcoming payments via Unosend
+- **Email alerts** — automated email notifications before upcoming payments via Resend
 
 ## Tech Stack
 
@@ -38,7 +38,7 @@ A production-quality, private subscription tracker built with Next.js 16 App Rou
 - **Date handling**: date-fns with pt-BR locale
 - **Toasts**: Sonner
 - **Charts**: Recharts
-- **Email**: Unosend transactional email API
+- **Email**: Resend transactional email API
 
 ## Installation
 
@@ -70,7 +70,7 @@ ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=your-strong-password
 
 # Email alerts (optional — see Email Alerts setup below)
-UNOSEND_API_KEY=
+RESEND_API_KEY=
 CRON_SECRET=
 ```
 
@@ -90,16 +90,16 @@ Open [http://localhost:3000](http://localhost:3000) and log in with your admin c
 
 ## Email Alerts Setup
 
-Email alerts notify you before subscriptions are due. The feature requires a [Unosend](https://unosend.com) account and an external cron service.
+Email alerts notify you before subscriptions are due. The feature requires a [Resend](https://resend.com/) account and an external cron service.
 
-### 1. Create a Unosend account
+### 1. Create a Resend account
 
-1. Sign up at [unosend.co](https://unosend.co)
+1. Sign up at [resend.com/](https://resend.com/)
 2. Add and verify a sending domain (e.g. `yourdomain.com`)
 3. Go to **API Keys** and create a new key
 4. Copy the key into your `.env.local`:
    ```env
-   UNOSEND_API_KEY=uno_live_xxxxxxxxxxxx
+   RESEND_API_KEY=re_live_xxxxxxxxxxxx
    ```
 
 ### 2. Generate a CRON_SECRET
@@ -125,7 +125,7 @@ Go to **Settings** (gear icon in the top navbar) → **Alertas por Email**:
 | Ativar alertas | Master toggle for the feature |
 | Enviar alertas | Enable/disable sending without losing your config |
 | Dias antes | How many days before due date to alert (1–30) |
-| Remetente | Your verified Unosend sender — format: `user` + `@domain.com` |
+| Remetente | Your verified Resend sender — format: `user` + `@domain.com` |
 | Nome do remetente | Display name shown in the email From field |
 | Destinatários | One or more email addresses to receive the alerts |
 
@@ -160,7 +160,7 @@ Vercel Hobby has a 1-day minimum for cron jobs. Use [cron-job.org](https://cron-
 
 ## Security Notes
 
-- **No secrets reach the client** — MongoDB URI, `AUTH_SECRET`, `UNOSEND_API_KEY`, and `CRON_SECRET` are server-only. Key lib files use `"server-only"` to prevent accidental client bundling.
+- **No secrets reach the client** — MongoDB URI, `AUTH_SECRET`, `RESEND_API_KEY`, and `CRON_SECRET` are server-only. Key lib files use `"server-only"` to prevent accidental client bundling.
 - **All API routes validate the session** before any DB operation.
 - **Cron endpoint is protected** by a Bearer secret — unauthenticated requests get `401`.
 - **Passwords hashed** with bcryptjs (12 rounds).

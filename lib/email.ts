@@ -2,6 +2,9 @@
 
 import { addDays, format } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export type AlertSubscription = {
   name: string
@@ -104,28 +107,25 @@ function buildEmailHtml(subscriptions: AlertSubscription[], daysBefore: number):
 </html>`
 }
 
-async function callUnosend(
+async function callcallResend(
   settings: AlertSettings,
   subject: string,
   html: string
 ): Promise<{ success: boolean; error?: string }> {
-  const apiKey = process.env.UNOSEND_API_KEY
-  if (!apiKey) return { success: false, error: "UNOSEND_API_KEY não configurada" }
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) return { success: false, error: "RESEND_API_KEY não configurada" }
 
   const from = `${settings.fromUser}@${settings.fromDomain}`
 
-  const res = await fetch("https://api.unosend.co/emails", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({ from, to: settings.recipients, subject, html }),
-  })
+  const { data, error } = await resend.emails.send({
+    from,
+    to: settings.recipients,
+    subject,
+    html,
+  });
 
-  if (!res.ok) {
-    const body = await res.text().catch(() => res.status.toString())
-    return { success: false, error: `Unosend ${res.status}: ${body}` }
+  if (error) {
+    return { success: false, error: `callResend ${error}` }
   }
 
   return { success: true }
@@ -137,7 +137,7 @@ export async function sendPaymentAlertEmail(
 ): Promise<{ success: boolean; error?: string }> {
   const n = subscriptions.length
   const subject = `Assinei — ${n} vencimento${n !== 1 ? "s" : ""} nos próximos ${settings.daysBefore} dias`
-  return callUnosend(settings, subject, buildEmailHtml(subscriptions, settings.daysBefore))
+  return callcallResend(settings, subject, buildEmailHtml(subscriptions, settings.daysBefore))
 }
 
 export async function sendTestEmail(
@@ -150,5 +150,5 @@ export async function sendTestEmail(
     nextPaymentDate: addDays(new Date(), 2),
     daysUntil: 2,
   }
-  return callUnosend(settings, "Assinei — email de teste", buildEmailHtml([testSub], settings.daysBefore))
+  return callcallResend(settings, "Assinei — email de teste", buildEmailHtml([testSub], settings.daysBefore))
 }

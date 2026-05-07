@@ -204,12 +204,12 @@ export function AlertSettingsForm() {
       <Toggle
         checked={settings.featureEnabled}
         onChange={(v) => set("featureEnabled", v)}
-        label="Ativar integração com Unosend"
+        label="Ativar integração com Resend"
       />
 
       {!settings.featureEnabled && (
         <p className="text-sm text-muted-foreground bg-muted/50 rounded-lg px-4 py-3">
-          A integração com Unosend está desativada. Configure e ative para começar a receber alertas por email.
+          A integração com Resend está desativada. Configure e ative para começar a receber alertas por email.
         </p>
       )}
 
@@ -295,7 +295,7 @@ export function AlertSettingsForm() {
                       onChange={(e) => set("fromDomain", e.target.value.slice(0, 253))}
                       placeholder="seudominio.com.br"
                       className="sm:flex-1 min-w-0"
-                      title="Use um domínio já verificado na sua conta Unosend."
+                      title="Use um domínio já verificado na sua conta Resend."
                     />
                   </div>
                 </div>
