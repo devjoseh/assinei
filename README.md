@@ -3,7 +3,7 @@
 
 A production-quality, private subscription tracker built with Next.js 16 App Router. Track your recurring expenses, get cost breakdowns, and never miss a payment again.
 
-![screenshot placeholder](docs/screenshot.png)
+![screenshot placeholder](./public/assinei-banner.png)
 
 ## Features
 
