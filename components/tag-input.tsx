@@ -124,7 +124,6 @@ export function TagInput({ value, onChange }: TagInputProps) {
               onMouseDown={(e) => { e.preventDefault(); addTag(s.tag) }}
             >
               <span>{s.tag}</span>
-              <span className="text-xs text-muted-foreground">{s.usageCount}×</span>
             </button>
           ))}
         </div>

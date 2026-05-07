@@ -52,17 +52,25 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const db = await getDb()
-    const result = await db.collection("subscriptions").findOneAndUpdate(
-      { _id: new ObjectId(id), userId: new ObjectId(session.user.id) },
+    const filter = { _id: new ObjectId(id), userId: new ObjectId(session.user.id) }
+    const before = await db.collection("subscriptions").findOneAndUpdate(
+      filter,
       { $set: updateData },
-      { returnDocument: "after" }
+      { returnDocument: "before" }
     )
 
-    if (!result) return NextResponse.json({ error: "Não encontrado" }, { status: 404 })
+    if (!before) return NextResponse.json({ error: "Não encontrado" }, { status: 404 })
 
-    if (parsed.data.tags?.length) {
-      await upsertTagsHistory(db, new ObjectId(session.user.id), parsed.data.tags)
+    if (parsed.data.tags !== undefined) {
+      const oldTags: string[] = (before.tags as string[]) ?? []
+      const newTags = parsed.data.tags.filter((t) => !oldTags.includes(t))
+      if (newTags.length) {
+        await upsertTagsHistory(db, new ObjectId(session.user.id), newTags)
+      }
     }
+
+    const result = await db.collection("subscriptions").findOne(filter)
+    if (!result) return NextResponse.json({ error: "Não encontrado" }, { status: 404 })
 
     return NextResponse.json({ ...result, _id: result._id.toString(), userId: result.userId.toString() })
   } catch {
