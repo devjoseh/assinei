@@ -113,7 +113,8 @@ export function SubscriptionForm({ open, subscription, onClose, onSave }: Subscr
     setLoading(true)
     try {
       await onSave(payload)
-      if (form.imageUrl) {
+      const originalImageUrl = subscription?.imageUrl || ""
+      if (form.imageUrl && form.imageUrl !== originalImageUrl) {
         fetch("/api/image-history", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
