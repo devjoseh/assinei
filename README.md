@@ -74,10 +74,11 @@ RESEND_API_KEY=
 CRON_SECRET=
 ```
 
-### Create the admin user
+### Create the admin user and seed default categories
 
 ```bash
 npm run seed
+npm run seed-categories
 ```
 
 ### Start the development server

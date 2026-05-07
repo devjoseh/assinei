@@ -5,11 +5,12 @@ import { ImageHistory, Subscription } from "@/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Trash2, Settings, Tag, Bell } from "lucide-react"
+import { Trash2, Settings, Tag, Bell, FolderOpen } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { AlertSettingsForm } from "@/components/alert-settings-form"
+import { CategoryList } from "@/components/category-list"
 
 type TagEntry = { _id: string; tag: string; usageCount: number }
 
@@ -155,6 +156,21 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent>
           <AlertSettingsForm />
+        </CardContent>
+      </Card>
+
+      <Card className="border border-border">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <FolderOpen className="h-4 w-4" />
+            Categorias
+          </CardTitle>
+          <CardDescription>
+            Gerencie suas categorias. Arraste para reordenar, edite cores e ícones.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CategoryList />
         </CardContent>
       </Card>
 

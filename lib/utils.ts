@@ -1,15 +1,23 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { BillingCycle } from "@/types"
+import { BillingCycle, Currency } from "@/types"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatCurrency(cents: number): string {
-  return new Intl.NumberFormat("pt-BR", {
+const CURRENCY_LOCALES: Record<Currency, string> = {
+  BRL: "pt-BR",
+  USD: "en-US",
+  EUR: "de-DE",
+  GBP: "en-GB",
+  ARS: "es-AR",
+}
+
+export function formatCurrency(cents: number, currency: Currency = "BRL"): string {
+  return new Intl.NumberFormat(CURRENCY_LOCALES[currency] ?? "pt-BR", {
     style: "currency",
-    currency: "BRL",
+    currency,
   }).format(cents / 100)
 }
 

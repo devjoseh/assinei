@@ -2,6 +2,7 @@
 
 import { Stats } from "@/types"
 import { formatCurrency, getUrgencyBg, parseDate } from "@/lib/utils"
+import type { Currency } from "@/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -52,7 +53,14 @@ export function UpcomingPayments({ stats, loading }: UpcomingPaymentsProps) {
                 </p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <span className="text-sm font-medium">{formatCurrency(payment.price)}</span>
+                <span className="text-sm font-medium">
+                  {formatCurrency(payment.price, (payment.currency || "BRL") as Currency)}
+                </span>
+                {(payment.currency || "BRL") !== "BRL" && (
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground uppercase">
+                    {payment.currency}
+                  </span>
+                )}
                 <Badge
                   variant="secondary"
                   className={cn("text-xs", getUrgencyBg(payment.daysUntil))}

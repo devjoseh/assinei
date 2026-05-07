@@ -2,7 +2,9 @@
 
 import { Subscription } from "@/types"
 import { formatCurrency, normalizeToMonthly, getDaysUntil, getUrgencyBg, getInitials, parseDate } from "@/lib/utils"
-import { BILLING_CYCLE_LABELS, CATEGORY_COLORS } from "@/lib/constants"
+import { BILLING_CYCLE_LABELS, CURRENCY_SYMBOLS } from "@/lib/constants"
+import { useCategories } from "@/components/categories-provider"
+import type { Currency } from "@/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -51,7 +53,8 @@ function TagChips({ tags }: { tags?: string[] }) {
 
 function Logo({ sub, size = "md" }: { sub: Subscription; size?: "sm" | "md" }) {
   const [imgError, setImgError] = useState(false)
-  const categoryColor = CATEGORY_COLORS[sub.category] || "#8C8C8C"
+  const { getColor } = useCategories()
+  const categoryColor = getColor(sub.category)
   const dim = size === "sm" ? "w-8 h-8 text-xs" : "w-10 h-10 text-sm"
 
   if (sub.imageUrl && !imgError) {
@@ -87,7 +90,9 @@ export function SubscriptionCard({
   const monthlyPrice = normalizeToMonthly(sub.price, sub.billingCycle)
   const daysUntil = getDaysUntil(sub.nextPaymentDate)
   const urgencyClass = getUrgencyBg(daysUntil)
-  const categoryColor = CATEGORY_COLORS[sub.category] || "#8C8C8C"
+  const { getColor } = useCategories()
+  const categoryColor = getColor(sub.category)
+  const currency = (sub.currency || "BRL") as Currency
   const formattedDate = format(parseDate(sub.nextPaymentDate), "d 'de' MMM. yyyy", { locale: ptBR })
 
   const urgencyPill = (
@@ -126,15 +131,21 @@ export function SubscriptionCard({
 
           <div className="text-right shrink-0">
             <p className="font-semibold text-sm whitespace-nowrap">
-              {formatCurrency(Math.round(monthlyPrice))}
+              {formatCurrency(Math.round(monthlyPrice), currency)}
               <span className="text-xs font-normal text-muted-foreground">/mês</span>
             </p>
             {sub.price !== Math.round(monthlyPrice) && (
               <p className="text-[11px] text-muted-foreground hidden sm:block">
-                {formatCurrency(sub.price)}
+                {formatCurrency(sub.price, currency)}
               </p>
             )}
           </div>
+
+          {currency !== "BRL" && (
+            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground uppercase tracking-wide shrink-0">
+              {currency}
+            </span>
+          )}
 
           {urgencyPill}
 
@@ -200,12 +211,17 @@ export function SubscriptionCard({
         {/* Price */}
         <div className="mt-2">
           <div className="flex items-baseline gap-1">
-            <span className="font-bold text-base text-foreground">{formatCurrency(Math.round(monthlyPrice))}</span>
+            <span className="font-bold text-base text-foreground">{formatCurrency(Math.round(monthlyPrice), currency)}</span>
             <span className="text-xs text-muted-foreground">/ mês</span>
+            {currency !== "BRL" && (
+              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground uppercase ml-0.5">
+                {currency}
+              </span>
+            )}
           </div>
           {sub.price !== Math.round(monthlyPrice) && (
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              {formatCurrency(sub.price)} · {BILLING_CYCLE_LABELS[sub.billingCycle].toLowerCase()}
+              {formatCurrency(sub.price, currency)} · {BILLING_CYCLE_LABELS[sub.billingCycle].toLowerCase()}
             </p>
           )}
         </div>

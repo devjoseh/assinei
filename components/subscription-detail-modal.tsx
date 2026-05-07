@@ -10,7 +10,9 @@ import {
   getInitials,
   parseDate,
 } from "@/lib/utils"
-import { BILLING_CYCLE_LABELS, CATEGORY_COLORS } from "@/lib/constants"
+import { BILLING_CYCLE_LABELS } from "@/lib/constants"
+import { useCategories } from "@/components/categories-provider"
+import type { Currency } from "@/types"
 import {
   Dialog,
   DialogContent,
@@ -37,7 +39,8 @@ interface SubscriptionDetailModalProps {
 
 function Logo({ sub }: { sub: Subscription }) {
   const [imgError, setImgError] = useState(false)
-  const categoryColor = CATEGORY_COLORS[sub.category] || "#8C8C8C"
+  const { getColor } = useCategories()
+  const categoryColor = getColor(sub.category)
 
   if (sub.imageUrl && !imgError) {
     return (
@@ -107,13 +110,15 @@ function ModalContent({
   const monthlyPrice = normalizeToMonthly(sub.price, sub.billingCycle)
   const daysUntil = getDaysUntil(sub.nextPaymentDate)
   const urgencyClass = getUrgencyBg(daysUntil)
-  const categoryColor = CATEGORY_COLORS[sub.category] || "#8C8C8C"
+  const { getColor } = useCategories()
+  const categoryColor = getColor(sub.category)
+  const currency = (sub.currency || "BRL") as Currency
   const formattedDate = format(parseDate(sub.nextPaymentDate), "d 'de' MMMM 'de' yyyy", { locale: ptBR })
   const cycleDiffers = sub.price !== Math.round(monthlyPrice)
 
   function handleCopy() {
     navigator.clipboard.writeText(
-      `${sub.name} — ${formatCurrency(sub.price)} (${BILLING_CYCLE_LABELS[sub.billingCycle]})`
+      `${sub.name} — ${formatCurrency(sub.price, currency)} (${BILLING_CYCLE_LABELS[sub.billingCycle]})`
     )
     toast.success("Copiado!")
   }
@@ -160,10 +165,13 @@ function ModalContent({
         <div className="rounded-lg bg-muted/50 px-4 py-3 flex items-start justify-between gap-4">
           <div>
             <p className="text-xs text-muted-foreground mb-0.5">Valor</p>
-            <p className="font-bold text-xl leading-none">{formatCurrency(sub.price)}</p>
+            <p className="font-bold text-xl leading-none">{formatCurrency(sub.price, currency)}</p>
             <p className="text-xs text-muted-foreground mt-1">
               {BILLING_CYCLE_LABELS[sub.billingCycle].toLowerCase()}
-              {cycleDiffers && ` · ${formatCurrency(Math.round(monthlyPrice))}/mês`}
+              {cycleDiffers && ` · ${formatCurrency(Math.round(monthlyPrice), currency)}/mês`}
+              {currency !== "BRL" && (
+                <span className="ml-1 text-[10px] font-medium px-1 py-0.5 rounded bg-muted uppercase">{currency}</span>
+              )}
             </p>
           </div>
           <div className="text-right shrink-0">

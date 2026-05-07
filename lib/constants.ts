@@ -1,17 +1,20 @@
-import { BillingCycle } from "@/types"
+import { BillingCycle, Currency } from "@/types"
 
-export const CATEGORIES = [
-  "Streaming",
-  "SaaS",
-  "Jogos",
-  "Educação",
-  "Música",
-  "Notícias",
-  "Produtividade",
-  "Segurança",
-  "Armazenamento",
-  "Outros",
-] as const
+export const CURRENCIES: { code: Currency; symbol: string; label: string }[] = [
+  { code: "BRL", symbol: "R$",  label: "Real Brasileiro"   },
+  { code: "USD", symbol: "US$", label: "Dólar Americano"   },
+  { code: "EUR", symbol: "€",   label: "Euro"              },
+  { code: "GBP", symbol: "£",   label: "Libra Esterlina"   },
+  { code: "ARS", symbol: "$",   label: "Peso Argentino"    },
+]
+
+export const CURRENCY_SYMBOLS: Record<Currency, string> = {
+  BRL: "R$",
+  USD: "US$",
+  EUR: "€",
+  GBP: "£",
+  ARS: "$",
+}
 
 export const BILLING_CYCLES: { value: BillingCycle; label: string }[] = [
   { value: "weekly", label: "Semanal" },
@@ -27,19 +30,6 @@ export const BILLING_CYCLE_LABELS: Record<BillingCycle, string> = {
   quarterly: "Trimestral",
   semiannual: "Semestral",
   annual: "Anual",
-}
-
-export const CATEGORY_COLORS: Record<string, string> = {
-  Streaming: "#E50914",
-  SaaS: "#0078D4",
-  Jogos: "#6E40C9",
-  Educação: "#00A86B",
-  Música: "#1DB954",
-  Notícias: "#FF6B35",
-  Produtividade: "#F4A300",
-  Segurança: "#DC143C",
-  Armazenamento: "#4A90D9",
-  Outros: "#8C8C8C",
 }
 
 export const DEFAULT_COLORS = [

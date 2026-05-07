@@ -1,8 +1,10 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef } from "react"
 import { useSubscriptions } from "@/hooks/use-subscriptions"
 import { useStats } from "@/hooks/use-stats"
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
+import { useCategories } from "@/components/categories-provider"
 import { Subscription } from "@/types"
 import { StatsBar } from "@/components/stats-bar"
 import { SubscriptionCard } from "@/components/subscription-card"
@@ -14,6 +16,8 @@ import { SubscriptionDetailModal } from "@/components/subscription-detail-modal"
 import { CategoryFilter } from "@/components/category-filter"
 import { UpcomingPayments } from "@/components/upcoming-payments"
 import { MonthlyChart } from "@/components/monthly-chart"
+import { CategoryBreakdown } from "@/components/category-breakdown"
+import { KeyboardShortcutsModal } from "@/components/keyboard-shortcuts-modal"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -51,10 +55,34 @@ export default function DashboardPage() {
   const [paymentSub, setPaymentSub] = useState<Subscription | null>(null)
   const [historySub, setHistorySub] = useState<Subscription | null>(null)
   const [detailSub, setDetailSub] = useState<Subscription | null>(null)
+  const [shortcutsModalOpen, setShortcutsModalOpen] = useState(false)
+
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const { categories: allCategories } = useCategories()
 
   const { subscriptions, allSubscriptions, loading, createSubscription, updateSubscription, deleteSubscription, toggleActive } =
     useSubscriptions({ search, categories, tags: selectedTags, sort })
   const { stats, loading: statsLoading, refetch: refetchStats } = useStats()
+
+  const anyModalOpen = formOpen || !!deleteSub || !!paymentSub || !!historySub || !!detailSub || shortcutsModalOpen
+
+  useKeyboardShortcuts({
+    searchInputRef,
+    categories: allCategories.map((c) => c.name),
+    onSelectCategory: (index) => {
+      if (index === -1) {
+        setCategories([])
+      } else {
+        const name = allCategories[index]?.name
+        if (name) setCategories([name])
+      }
+      resetPage()
+    },
+    onToggleView: () => setViewMode((v) => (v === "grid" ? "list" : "grid")),
+    onNewSubscription: openAdd,
+    onOpenShortcuts: () => setShortcutsModalOpen(true),
+    disabled: anyModalOpen,
+  })
 
   const availableTags = useMemo(() => {
     const tagSet = new Set<string>()
@@ -124,7 +152,9 @@ export default function DashboardPage() {
 
       <UpcomingPayments stats={stats} loading={statsLoading} />
 
-      <MonthlyChart />
+      <MonthlyChart currencies={stats?.totals?.map((t) => t.currency)} />
+
+      <CategoryBreakdown stats={stats} loading={statsLoading} />
 
       <div className="space-y-4">
         {/* Search + Sort + View toggle */}
@@ -132,6 +162,7 @@ export default function DashboardPage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
+              ref={searchInputRef}
               placeholder="Buscar assinaturas..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); resetPage() }}
@@ -177,7 +208,7 @@ export default function DashboardPage() {
           </Select>
         </div>
 
-        <CategoryFilter selected={categories} onChange={(c) => { setCategories(c); resetPage() }} />
+        <CategoryFilter selected={categories} onChange={(c) => { setCategories(c); resetPage() }} breakdown={stats?.categoryBreakdown} />
 
         {availableTags.length > 0 && (
           <div className="flex flex-wrap gap-2">
@@ -304,6 +335,10 @@ export default function DashboardPage() {
 
       <Footer />
 
+      <p className="hidden md:block text-center text-xs text-muted-foreground">
+        Pressione <kbd className="inline-block rounded border border-border bg-muted px-1 py-0.5 font-mono text-[11px] text-foreground">?</kbd> para ver os atalhos de teclado
+      </p>
+
       {/* FAB */}
       <button
         onClick={openAdd}
@@ -345,6 +380,11 @@ export default function DashboardPage() {
         onPayment={(sub) => { setDetailSub(null); setPaymentSub(sub) }}
         onHistory={(sub) => { setDetailSub(null); setHistorySub(sub) }}
         onToggleActive={(id, isActive) => { setDetailSub(null); handleToggle(id, isActive) }}
+      />
+
+      <KeyboardShortcutsModal
+        open={shortcutsModalOpen}
+        onClose={() => setShortcutsModalOpen(false)}
       />
     </div>
   )

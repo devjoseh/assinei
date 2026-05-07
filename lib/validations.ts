@@ -10,6 +10,7 @@ export const subscriptionSchema = z.object({
   billingCycle: z.enum(["weekly", "monthly", "quarterly", "semiannual", "annual"]),
   nextPaymentDate: z.string().min(1, "Data do próximo pagamento é obrigatória"),
   category: z.string().min(1, "Categoria é obrigatória"),
+  currency: z.enum(["BRL", "USD", "EUR", "GBP", "ARS"]).optional().default("BRL"),
   imageUrl: z.string().url("URL inválida").optional().or(z.literal("")),
   color: z
     .string()
@@ -55,3 +56,20 @@ export const alertSettingsSchema = z.object({
 })
 
 export const updateAlertSettingsSchema = alertSettingsSchema.partial()
+
+export const categorySchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório").max(30),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Cor inválida"),
+  icon: z.string().max(1).optional(),
+})
+
+export const updateCategorySchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório").max(30).optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Cor inválida").optional(),
+  icon: z.string().max(1).nullable().optional(),
+  isHidden: z.boolean().optional(),
+})
+
+export const reorderCategoriesSchema = z.object({
+  ids: z.array(z.string().min(1)).max(30),
+})

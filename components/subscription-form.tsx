@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react"
 import { Subscription } from "@/types"
-import { CATEGORIES, BILLING_CYCLES, DEFAULT_COLORS } from "@/lib/constants"
+import { BILLING_CYCLES, DEFAULT_COLORS, CURRENCIES } from "@/lib/constants"
+import { useCategories } from "@/components/categories-provider"
 import { subscriptionSchema } from "@/lib/validations"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -41,6 +42,7 @@ const EMPTY_FORM = {
   billingCycle: "monthly" as Subscription["billingCycle"],
   nextPaymentDate: format(new Date(), "yyyy-MM-dd"),
   category: "",
+  currency: "BRL" as Subscription["currency"],
   imageUrl: "",
   color: DEFAULT_COLORS[0],
   notes: "",
@@ -48,6 +50,7 @@ const EMPTY_FORM = {
 }
 
 export function SubscriptionForm({ open, subscription, onClose, onSave }: SubscriptionFormProps) {
+  const { categories } = useCategories()
   const [form, setForm] = useState(EMPTY_FORM)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
@@ -65,6 +68,7 @@ export function SubscriptionForm({ open, subscription, onClose, onSave }: Subscr
         billingCycle: subscription.billingCycle || "monthly",
         nextPaymentDate: dateStr,
         category: subscription.category || "",
+        currency: subscription.currency || "BRL",
         imageUrl: subscription.imageUrl || "",
         color: subscription.color || DEFAULT_COLORS[0],
         notes: subscription.notes || "",
@@ -93,6 +97,7 @@ export function SubscriptionForm({ open, subscription, onClose, onSave }: Subscr
       billingCycle: form.billingCycle,
       nextPaymentDate: form.nextPaymentDate,
       category: form.category,
+      currency: form.currency,
       imageUrl: form.imageUrl || undefined,
       color: form.color,
       notes: form.notes,
@@ -170,11 +175,29 @@ export function SubscriptionForm({ open, subscription, onClose, onSave }: Subscr
             {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
           </div>
 
-          {/* Preço + Ciclo */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* Moeda + Preço + Ciclo */}
+          <div className="grid grid-cols-[auto_1fr_1fr] gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">
+                Moeda <span className="text-destructive">*</span>
+              </Label>
+              <Select value={form.currency} onValueChange={(v) => v && set("currency", v)}>
+                <SelectTrigger className="w-[80px]">
+                  <SelectValue>{CURRENCIES.find((c) => c.code === form.currency)?.symbol}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((c) => (
+                    <SelectItem key={c.code} value={c.code}>
+                      {c.symbol} {c.code}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="space-y-1.5">
               <Label htmlFor="price" className="text-sm font-medium">
-                Preço (R$) <span className="text-destructive">*</span>
+                Preço ({CURRENCIES.find((c) => c.code === form.currency)?.symbol || "R$"}) <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="price"
@@ -237,8 +260,13 @@ export function SubscriptionForm({ open, subscription, onClose, onSave }: Subscr
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map((cat) => (
-                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat._id} value={cat.name}>
+                      <span className="flex items-center gap-1.5">
+                        {cat.icon && <span>{cat.icon}</span>}
+                        {cat.name}
+                      </span>
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>

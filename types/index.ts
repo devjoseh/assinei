@@ -1,5 +1,20 @@
 export type BillingCycle = "weekly" | "monthly" | "quarterly" | "semiannual" | "annual"
 
+export type Currency = "BRL" | "USD" | "EUR" | "GBP" | "ARS"
+
+export interface Category {
+  _id: string
+  userId: string
+  name: string
+  color: string
+  icon?: string
+  isDefault: boolean
+  isHidden: boolean
+  order: number
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Subscription {
   _id: string
   userId: string
@@ -9,6 +24,7 @@ export interface Subscription {
   billingCycle: BillingCycle
   nextPaymentDate: string
   category: string
+  currency?: Currency
   imageUrl?: string
   color?: string
   isActive: boolean
@@ -19,14 +35,18 @@ export interface Subscription {
 }
 
 export interface Stats {
-  totalMonthly: number
-  totalAnnual: number
-  totalSemiannual: number
-  mostExpensive: { name: string; price: number; billingCycle: BillingCycle } | null
-  nextPayment: { name: string; date: string; daysUntil: number } | null
-  upcomingPayments: Array<{ name: string; date: string; daysUntil: number; price: number }>
-  totalActive: number
-  categoryBreakdown: Array<{ category: string; total: number; count: number }>
+  totals: Array<{
+    currency: string
+    symbol: string
+    totalMonthly: number
+    totalAnnual: number
+    totalSemiannual: number
+    mostExpensive: { name: string; price: number; billingCycle: BillingCycle } | null
+    totalActive: number
+  }>
+  nextPayment: { name: string; date: string; daysUntil: number; currency?: string } | null
+  upcomingPayments: Array<{ name: string; date: string; daysUntil: number; price: number; currency?: string }>
+  categoryBreakdown: Array<{ category: string; currency: string; total: number; count: number; color: string; icon?: string }>
 }
 
 export interface ImageHistory {

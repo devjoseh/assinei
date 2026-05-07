@@ -12,9 +12,18 @@ import {
 } from "recharts"
 import type { TooltipProps } from "recharts"
 import { formatCurrency } from "@/lib/utils"
+import { CURRENCY_SYMBOLS } from "@/lib/constants"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import type { Currency } from "@/types"
 
 type MonthData = {
   label: string
@@ -41,21 +50,28 @@ function CustomTooltip({ active, payload }: TooltipProps<number, string> & { pay
   )
 }
 
-export function MonthlyChart() {
+interface MonthlyChartProps {
+  currencies?: string[]
+}
+
+export function MonthlyChart({ currencies }: MonthlyChartProps) {
   const [data, setData] = useState<MonthData[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedCurrency, setSelectedCurrency] = useState("all")
   const [collapsed, setCollapsed] = useState(() => {
     if (typeof window === "undefined") return false
     return localStorage.getItem("chart-collapsed") === "true"
   })
 
   useEffect(() => {
-    fetch("/api/payments/summary")
+    setLoading(true)
+    const params = selectedCurrency !== "all" ? `?currency=${selectedCurrency}` : ""
+    fetch(`/api/payments/summary${params}`)
       .then((r) => r.json())
       .then((json) => setData(json.months ?? []))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [selectedCurrency])
 
   function toggle() {
     setCollapsed((prev) => {
@@ -65,20 +81,50 @@ export function MonthlyChart() {
     })
   }
 
+  const showCurrencySelector = currencies && currencies.length > 1
   const allZero = data.every((d) => d.total === 0)
+
+  // Set default to most-used currency on first load
+  useEffect(() => {
+    if (currencies && currencies.length > 0 && selectedCurrency === "all") {
+      const mainCurrency = currencies[0]
+      if (mainCurrency !== "BRL" && currencies.includes("BRL")) {
+        // Keep "all" if BRL is present
+      } else if (currencies.length === 1) {
+        setSelectedCurrency(currencies[0])
+      }
+    }
+  }, [currencies])
 
   return (
     <div className="space-y-2">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-2">
         <div>
           <h2 className="text-sm font-semibold text-foreground">Evolução de Gastos</h2>
           <p className="text-xs text-muted-foreground">
             Últimos 6 meses · baseado em pagamentos registrados
           </p>
         </div>
-        <Button variant="ghost" size="icon" className="h-7 w-7 -mt-0.5" onClick={toggle}>
-          {collapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-        </Button>
+        <div className="flex items-center gap-2">
+          {showCurrencySelector && (
+            <Select value={selectedCurrency} onValueChange={(v) => v && setSelectedCurrency(v)}>
+              <SelectTrigger className="h-7 text-xs w-[110px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                {currencies.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {CURRENCY_SYMBOLS[c as Currency] ?? c} {c}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <Button variant="ghost" size="icon" className="h-7 w-7 -mt-0.5" onClick={toggle}>
+            {collapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+          </Button>
+        </div>
       </div>
 
       {!collapsed && (
