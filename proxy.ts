@@ -5,8 +5,10 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth
   const isAuthPage = req.nextUrl.pathname === "/"
   const isApiAuthRoute = req.nextUrl.pathname.startsWith("/api/auth")
+  const isApiCronRoute = req.nextUrl.pathname.startsWith("/api/cron")
 
   if (isApiAuthRoute) return NextResponse.next()
+  if (isApiCronRoute) return NextResponse.next()
 
   if (isAuthPage) {
     if (isLoggedIn) {
