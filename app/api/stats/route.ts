@@ -40,7 +40,9 @@ export async function GET() {
 
     const upcomingPayments = subs
       .map((s) => {
-        const datePart = String(s.nextPaymentDate).split("T")[0]
+        const raw: Date | string = s.nextPaymentDate
+        const iso = raw instanceof Date ? raw.toISOString() : String(raw)
+        const datePart = iso.split("T")[0]
         const [y, m, d] = datePart.split("-").map(Number)
         const date = new Date(y, m - 1, d)
         date.setHours(0, 0, 0, 0)
