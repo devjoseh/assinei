@@ -28,7 +28,7 @@ const FULL_MONTHS = [
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ]
 
-function CustomTooltip({ active, payload }: TooltipProps<number, string>) {
+function CustomTooltip({ active, payload }: TooltipProps<number, string> & { payload?: { payload: MonthData }[] }) {
   if (!active || !payload?.length) return null
   const d = payload[0].payload as MonthData
   return (
