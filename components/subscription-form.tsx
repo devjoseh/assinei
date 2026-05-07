@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { ImageHistoryPicker } from "@/components/image-history-picker"
+import { TagInput } from "@/components/tag-input"
 import { Loader2, Pipette } from "lucide-react"
 import { format } from "date-fns"
 import { cn, parseDate } from "@/lib/utils"
@@ -43,6 +44,7 @@ const EMPTY_FORM = {
   imageUrl: "",
   color: DEFAULT_COLORS[0],
   notes: "",
+  tags: [] as string[],
 }
 
 export function SubscriptionForm({ open, subscription, onClose, onSave }: SubscriptionFormProps) {
@@ -66,6 +68,7 @@ export function SubscriptionForm({ open, subscription, onClose, onSave }: Subscr
         imageUrl: subscription.imageUrl || "",
         color: subscription.color || DEFAULT_COLORS[0],
         notes: subscription.notes || "",
+        tags: subscription.tags || [],
       })
     } else {
       setForm(EMPTY_FORM)
@@ -93,6 +96,7 @@ export function SubscriptionForm({ open, subscription, onClose, onSave }: Subscr
       imageUrl: form.imageUrl || undefined,
       color: form.color,
       notes: form.notes || undefined,
+      tags: form.tags.length > 0 ? form.tags : undefined,
       isActive: subscription?.isActive ?? true,
     }
 
@@ -320,6 +324,18 @@ export function SubscriptionForm({ open, subscription, onClose, onSave }: Subscr
               placeholder="Observações..."
               rows={3}
               className="flex w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none transition-colors"
+            />
+          </div>
+
+          {/* Tags */}
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">
+              Tags{" "}
+              <span className="text-muted-foreground font-normal">(opcional)</span>
+            </Label>
+            <TagInput
+              value={form.tags}
+              onChange={(tags) => setForm((prev) => ({ ...prev, tags }))}
             />
           </div>
 

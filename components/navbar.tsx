@@ -3,7 +3,7 @@
 import { signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { LogOut } from "lucide-react"
+import { LogOut, Settings } from "lucide-react"
 import Link from "next/link"
 
 export function Navbar() {
@@ -16,6 +16,11 @@ export function Navbar() {
 
         <div className="flex items-center gap-1">
           <ThemeToggle />
+          <Link href="/dashboard/settings">
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </Link>
           <Button
             variant="ghost"
             size="sm"

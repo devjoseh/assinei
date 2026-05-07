@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { getDb } from "@/lib/mongodb"
+import { upsertTagsHistory } from "@/lib/tags"
 import { subscriptionSchema } from "@/lib/validations"
 import { ObjectId } from "mongodb"
 import { NextRequest, NextResponse } from "next/server"
@@ -64,6 +65,11 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await db.collection("subscriptions").insertOne(doc)
+
+    if (parsed.data.tags?.length) {
+      await upsertTagsHistory(db, doc.userId, parsed.data.tags)
+    }
+
     return NextResponse.json(
       { ...doc, _id: result.insertedId.toString(), userId: doc.userId.toString() },
       { status: 201 }

@@ -34,17 +34,17 @@ export function UpcomingPayments({ stats, loading }: UpcomingPaymentsProps) {
   if (!stats?.upcomingPayments.length) return null
 
   return (
-    <Card className="border border-border shadow-sm">
-      <CardHeader className="pb-3">
+    <Card className="border border-border shadow-sm" size="sm">
+      <CardHeader>
         <CardTitle className="text-sm font-semibold flex items-center gap-2">
           <CalendarClock className="h-4 w-4 text-muted-foreground" />
           Próximos pagamentos (30 dias)
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
+        <div className="divide-y divide-border">
           {stats.upcomingPayments.map((payment, i) => (
-            <div key={i} className="flex items-center justify-between gap-3 py-2 border-b border-border last:border-0">
+            <div key={i} className="flex items-center justify-between gap-3 py-1.5">
               <div className="min-w-0">
                 <p className="font-medium text-sm text-foreground truncate">{payment.name}</p>
                 <p className="text-xs text-muted-foreground">

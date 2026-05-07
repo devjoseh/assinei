@@ -6,11 +6,10 @@ import { BILLING_CYCLE_LABELS, CATEGORY_COLORS } from "@/lib/constants"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Pencil, Trash2, Copy, Power } from "lucide-react"
+import { Pencil, Trash2 } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { useState } from "react"
-import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
 interface SubscriptionCardProps {
@@ -19,6 +18,35 @@ interface SubscriptionCardProps {
   onEdit: (sub: Subscription) => void
   onDelete: (sub: Subscription) => void
   onToggleActive: (id: string, isActive: boolean) => void
+  onPayment: (sub: Subscription) => void
+  onHistory: (sub: Subscription) => void
+  onDetail: (sub: Subscription) => void
+}
+
+function TagChips({ tags }: { tags?: string[] }) {
+  if (!tags?.length) return null
+  const visible = tags.slice(0, 3)
+  const hidden = tags.slice(3)
+  return (
+    <div className="flex flex-wrap gap-1 mt-1">
+      {visible.map((tag) => (
+        <span
+          key={tag}
+          className="text-[10px] px-1.5 leading-5 rounded-md border border-border text-muted-foreground"
+        >
+          {tag}
+        </span>
+      ))}
+      {hidden.length > 0 && (
+        <span
+          className="text-[10px] px-1.5 leading-5 rounded-md border border-border text-muted-foreground cursor-default"
+          title={hidden.join(", ")}
+        >
+          +{hidden.length}
+        </span>
+      )}
+    </div>
+  )
 }
 
 function Logo({ sub, size = "md" }: { sub: Subscription; size?: "sm" | "md" }) {
@@ -52,6 +80,9 @@ export function SubscriptionCard({
   onEdit,
   onDelete,
   onToggleActive,
+  onPayment,
+  onHistory,
+  onDetail,
 }: SubscriptionCardProps) {
   const monthlyPrice = normalizeToMonthly(sub.price, sub.billingCycle)
   const daysUntil = getDaysUntil(sub.nextPaymentDate)
@@ -59,56 +90,25 @@ export function SubscriptionCard({
   const categoryColor = CATEGORY_COLORS[sub.category] || "#8C8C8C"
   const formattedDate = format(parseDate(sub.nextPaymentDate), "d 'de' MMM. yyyy", { locale: ptBR })
 
-  function handleCopy() {
-    navigator.clipboard.writeText(
-      `${sub.name} — ${formatCurrency(sub.price)} (${BILLING_CYCLE_LABELS[sub.billingCycle]})`
-    )
-    toast.success("Copiado!")
-  }
-
   const urgencyPill = (
     <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full shrink-0", urgencyClass)}>
       {daysUntil === 0 ? "hoje" : daysUntil < 0 ? "vencido" : `${daysUntil}d`}
     </span>
   )
 
-  const actionButtons = (
-    <div className="flex items-center gap-0.5 shrink-0">
-      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleCopy} title="Copiar">
-        <Copy className="h-3.5 w-3.5" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7"
-        onClick={() => onToggleActive(sub._id, !sub.isActive)}
-        title={sub.isActive ? "Pausar" : "Ativar"}
-      >
-        <Power className={cn("h-3.5 w-3.5", sub.isActive ? "text-green-500" : "text-muted-foreground")} />
-      </Button>
-      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(sub)} title="Editar">
-        <Pencil className="h-3.5 w-3.5" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7 text-destructive hover:text-destructive"
-        onClick={() => onDelete(sub)}
-        title="Excluir"
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-      </Button>
-    </div>
-  )
-
   /* ── LIST VIEW ── */
   if (viewMode === "list") {
     return (
-      <Card className={cn("group border border-border shadow-sm transition-all hover:shadow-md", !sub.isActive && "opacity-50")}>
+      <Card
+        className={cn(
+          "group border border-border shadow-sm transition-all hover:shadow-md cursor-pointer",
+          !sub.isActive && "opacity-50"
+        )}
+        onClick={() => onDetail(sub)}
+      >
         <CardContent className="px-3 py-2.5 flex items-center gap-3">
           <Logo sub={sub} size="sm" />
 
-          {/* Name + date */}
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm text-foreground truncate">{sub.name}</p>
             <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
@@ -121,9 +121,9 @@ export function SubscriptionCard({
               </Badge>
               <span className="text-[11px] text-muted-foreground truncate">{formattedDate}</span>
             </div>
+            <TagChips tags={sub.tags} />
           </div>
 
-          {/* Price */}
           <div className="text-right shrink-0">
             <p className="font-semibold text-sm whitespace-nowrap">
               {formatCurrency(Math.round(monthlyPrice))}
@@ -136,12 +136,24 @@ export function SubscriptionCard({
             )}
           </div>
 
-          {/* Urgency */}
           {urgencyPill}
 
-          {/* Actions — desktop only (hidden on mobile to prevent layout breakage) */}
-          <div className="hidden sm:flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-            {actionButtons}
+          <div
+            className="hidden sm:flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(sub)} title="Editar">
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-destructive hover:text-destructive"
+              onClick={() => onDelete(sub)}
+              title="Excluir"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -152,20 +164,24 @@ export function SubscriptionCard({
   return (
     <Card
       className={cn(
-        "group border border-border shadow-sm transition-all hover:shadow-md overflow-hidden",
+        "group border border-border shadow-sm transition-all hover:shadow-md overflow-hidden cursor-pointer",
         !sub.isActive && "opacity-50"
       )}
+      onClick={() => onDetail(sub)}
     >
-      <CardContent className="p-4">
-        {/* Top: logo + name + actions */}
+      <CardContent className="p-3">
+        {/* Top: logo + name + edit/delete */}
         <div className="flex items-start gap-3">
           <Logo sub={sub} />
           <div className="flex-1 min-w-0 pt-0.5">
             <h3 className="font-semibold text-sm text-foreground truncate leading-tight">{sub.name}</h3>
             <p className="text-xs text-muted-foreground truncate mt-0.5">{sub.category}</p>
+            <TagChips tags={sub.tags} />
           </div>
-          {/* Actions: always visible on mobile, hover on desktop */}
-          <div className="flex flex-col gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
+          <div
+            className="flex flex-col gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onEdit(sub)} title="Editar">
               <Pencil className="h-3 w-3" />
             </Button>
@@ -182,7 +198,7 @@ export function SubscriptionCard({
         </div>
 
         {/* Price */}
-        <div className="mt-3">
+        <div className="mt-2">
           <div className="flex items-baseline gap-1">
             <span className="font-bold text-base text-foreground">{formatCurrency(Math.round(monthlyPrice))}</span>
             <span className="text-xs text-muted-foreground">/ mês</span>
@@ -195,7 +211,7 @@ export function SubscriptionCard({
         </div>
 
         {/* Footer: category + days + date */}
-        <div className="mt-3 space-y-1.5">
+        <div className="mt-2 space-y-1">
           <div className="flex items-center justify-between gap-2">
             <Badge
               variant="secondary"
@@ -207,22 +223,6 @@ export function SubscriptionCard({
             {urgencyPill}
           </div>
           <p className="text-[11px] text-muted-foreground">{formattedDate}</p>
-        </div>
-
-        {/* Extra actions row: copy + toggle (subtler) */}
-        <div className="mt-2 flex gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCopy} title="Copiar">
-            <Copy className="h-3 w-3" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6"
-            onClick={() => onToggleActive(sub._id, !sub.isActive)}
-            title={sub.isActive ? "Pausar" : "Ativar"}
-          >
-            <Power className={cn("h-3 w-3", sub.isActive ? "text-green-500" : "text-muted-foreground")} />
-          </Button>
         </div>
       </CardContent>
     </Card>

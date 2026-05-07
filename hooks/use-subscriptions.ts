@@ -7,6 +7,7 @@ interface Filters {
   categories?: string[]
   sort?: string
   search?: string
+  tags?: string[]
 }
 
 export function useSubscriptions(filters: Filters = {}) {
@@ -94,6 +95,11 @@ export function useSubscriptions(filters: Filters = {}) {
   }
   if (filters.categories && filters.categories.length > 0) {
     filtered = filtered.filter((s) => filters.categories!.includes(s.category))
+  }
+  if (filters.tags && filters.tags.length > 0) {
+    filtered = filtered.filter((s) =>
+      filters.tags!.every((tag) => s.tags?.includes(tag))
+    )
   }
 
   return {

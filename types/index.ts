@@ -13,6 +13,7 @@ export interface Subscription {
   color?: string
   isActive: boolean
   notes?: string
+  tags?: string[]
   createdAt: string
   updatedAt: string
 }

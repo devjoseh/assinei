@@ -8,8 +8,12 @@ import { StatsBar } from "@/components/stats-bar"
 import { SubscriptionCard } from "@/components/subscription-card"
 import { SubscriptionForm } from "@/components/subscription-form"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
+import { PaymentRegisterModal } from "@/components/payment-register-modal"
+import { PaymentHistoryDrawer } from "@/components/payment-history-drawer"
+import { SubscriptionDetailModal } from "@/components/subscription-detail-modal"
 import { CategoryFilter } from "@/components/category-filter"
 import { UpcomingPayments } from "@/components/upcoming-payments"
+import { MonthlyChart } from "@/components/monthly-chart"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -36,6 +40,7 @@ const PAGE_SIZE = 12
 export default function DashboardPage() {
   const [search, setSearch] = useState("")
   const [categories, setCategories] = useState<string[]>([])
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [sort, setSort] = useState("name")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [page, setPage] = useState(1)
@@ -43,10 +48,19 @@ export default function DashboardPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [editSub, setEditSub] = useState<Subscription | null>(null)
   const [deleteSub, setDeleteSub] = useState<Subscription | null>(null)
+  const [paymentSub, setPaymentSub] = useState<Subscription | null>(null)
+  const [historySub, setHistorySub] = useState<Subscription | null>(null)
+  const [detailSub, setDetailSub] = useState<Subscription | null>(null)
 
-  const { subscriptions, loading, createSubscription, updateSubscription, deleteSubscription, toggleActive } =
-    useSubscriptions({ search, categories, sort })
+  const { subscriptions, allSubscriptions, loading, createSubscription, updateSubscription, deleteSubscription, toggleActive } =
+    useSubscriptions({ search, categories, tags: selectedTags, sort })
   const { stats, loading: statsLoading, refetch: refetchStats } = useStats()
+
+  const availableTags = useMemo(() => {
+    const tagSet = new Set<string>()
+    allSubscriptions.filter((s) => s.isActive).forEach((s) => s.tags?.forEach((t) => tagSet.add(t)))
+    return Array.from(tagSet).sort()
+  }, [allSubscriptions])
 
   const totalPages = Math.max(1, Math.ceil(subscriptions.length / PAGE_SIZE))
   const safePage = Math.min(page, totalPages)
@@ -110,6 +124,8 @@ export default function DashboardPage() {
 
       <UpcomingPayments stats={stats} loading={statsLoading} />
 
+      <MonthlyChart />
+
       <div className="space-y-4">
         {/* Search + Sort + View toggle */}
         <div className="flex gap-2">
@@ -163,6 +179,33 @@ export default function DashboardPage() {
 
         <CategoryFilter selected={categories} onChange={(c) => { setCategories(c); resetPage() }} />
 
+        {availableTags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {availableTags.map((tag) => {
+              const active = selectedTags.includes(tag)
+              return (
+                <button
+                  key={tag}
+                  onClick={() => {
+                    setSelectedTags((prev) =>
+                      active ? prev.filter((t) => t !== tag) : [...prev, tag]
+                    )
+                    resetPage()
+                  }}
+                  className={`h-7 px-3 text-xs rounded-full border transition-all font-medium ${
+                    active
+                      ? "border-transparent text-white"
+                      : "border-border text-muted-foreground hover:border-current hover:text-foreground bg-background"
+                  }`}
+                  style={active ? { backgroundColor: "#E8770A", borderColor: "#E8770A" } : {}}
+                >
+                  {tag}
+                </button>
+              )
+            })}
+          </div>
+        )}
+
         {/* Cards */}
         {loading ? (
           <div className={gridClass}>
@@ -197,6 +240,9 @@ export default function DashboardPage() {
                   onEdit={openEdit}
                   onDelete={setDeleteSub}
                   onToggleActive={handleToggle}
+                  onPayment={setPaymentSub}
+                  onHistory={setHistorySub}
+                  onDetail={setDetailSub}
                 />
               ))}
             </div>
@@ -279,6 +325,26 @@ export default function DashboardPage() {
         subscription={deleteSub}
         onConfirm={handleDelete}
         onCancel={() => setDeleteSub(null)}
+      />
+
+      <PaymentRegisterModal
+        subscription={paymentSub}
+        onClose={() => setPaymentSub(null)}
+      />
+
+      <PaymentHistoryDrawer
+        subscription={historySub}
+        onClose={() => setHistorySub(null)}
+      />
+
+      <SubscriptionDetailModal
+        subscription={detailSub}
+        onClose={() => setDetailSub(null)}
+        onEdit={(sub) => { setDetailSub(null); openEdit(sub) }}
+        onDelete={(sub) => { setDetailSub(null); setDeleteSub(sub) }}
+        onPayment={(sub) => { setDetailSub(null); setPaymentSub(sub) }}
+        onHistory={(sub) => { setDetailSub(null); setHistorySub(sub) }}
+        onToggleActive={(id, isActive) => { setDetailSub(null); handleToggle(id, isActive) }}
       />
     </div>
   )

@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { getDb } from "@/lib/mongodb"
+import { upsertTagsHistory } from "@/lib/tags"
 import { updateSubscriptionSchema } from "@/lib/validations"
 import { ObjectId } from "mongodb"
 import { NextRequest, NextResponse } from "next/server"
@@ -58,6 +59,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     )
 
     if (!result) return NextResponse.json({ error: "Não encontrado" }, { status: 404 })
+
+    if (parsed.data.tags?.length) {
+      await upsertTagsHistory(db, new ObjectId(session.user.id), parsed.data.tags)
+    }
+
     return NextResponse.json({ ...result, _id: result._id.toString(), userId: result.userId.toString() })
   } catch {
     return NextResponse.json({ error: "Erro interno" }, { status: 500 })
