@@ -1,11 +1,15 @@
 import Link from "next/link"
+import Image from "next/image"
 
 export function Footer() {
   return (
     <footer className="border-t border-border mt-12 py-8 px-4">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
         <div className="text-center sm:text-left space-y-1">
-          <p className="font-medium text-foreground">Assinei</p>
+          <div className="flex items-center gap-2">
+            <Image src="/logo-assinei.png" alt="Assinei" width={20} height={20} className="rounded-md opacity-80" />
+            <p className="font-medium text-foreground">Assinei</p>
+          </div>
           <p className="text-xs">Suas assinaturas, sob controle. 💸</p>
         </div>
 

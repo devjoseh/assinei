@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Loader2 } from "lucide-react"
+import Image from "next/image"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -44,8 +45,15 @@ export default function LoginPage() {
       </div>
 
       <div className="w-full max-w-sm space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">Assinei</h1>
+        <div className="text-center space-y-2 flex flex-col items-center">
+          <Image
+            src="/assinei-banner.png"
+            alt="Assinei"
+            width={200}
+            height={75}
+            className="rounded-xl"
+            priority
+          />
           <p className="text-muted-foreground text-sm">Suas assinaturas, sob controle.</p>
         </div>
 
