@@ -73,3 +73,14 @@ export const updateCategorySchema = z.object({
 export const reorderCategoriesSchema = z.object({
   ids: z.array(z.string().min(1)).max(30),
 })
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Senha atual é obrigatória"),
+    newPassword: z.string().min(8, "Mínimo de 8 caracteres"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "As senhas não coincidem",
+    path: ["confirmPassword"],
+  })

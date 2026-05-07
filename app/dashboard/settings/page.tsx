@@ -5,12 +5,13 @@ import { ImageHistory, Subscription } from "@/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Trash2, Settings, Tag, Bell, FolderOpen } from "lucide-react"
+import { Trash2, Settings, Tag, Bell, FolderOpen, Lock } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { AlertSettingsForm } from "@/components/alert-settings-form"
 import { CategoryList } from "@/components/category-list"
+import { ChangePasswordForm } from "@/components/change-password-form"
 
 type TagEntry = { _id: string; tag: string; usageCount: number }
 
@@ -171,6 +172,21 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent>
           <CategoryList />
+        </CardContent>
+      </Card>
+
+      <Card className="border border-border">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Lock className="h-4 w-4" />
+            Segurança
+          </CardTitle>
+          <CardDescription>
+            Altere sua senha de acesso ao painel.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChangePasswordForm />
         </CardContent>
       </Card>
 

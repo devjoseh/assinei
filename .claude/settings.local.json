@@ -7,7 +7,12 @@
       "Bash(npm view *)",
       "WebSearch",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:www.npmjs.com)"
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(npm ls *)",
+      "Bash(npm uninstall *)",
+      "Bash(npm list *)",
+      "Bash(node *)",
+      "Bash(npm run *)"
     ]
   }
 }

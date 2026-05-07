@@ -18,6 +18,7 @@ import { UpcomingPayments } from "@/components/upcoming-payments"
 import { MonthlyChart } from "@/components/monthly-chart"
 import { CategoryBreakdown } from "@/components/category-breakdown"
 import { KeyboardShortcutsModal } from "@/components/keyboard-shortcuts-modal"
+import { PwaInstallBanner } from "@/components/pwa-install-banner"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -148,6 +149,8 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <PwaInstallBanner />
+
       <StatsBar stats={stats} loading={statsLoading} />
 
       <UpcomingPayments stats={stats} loading={statsLoading} />

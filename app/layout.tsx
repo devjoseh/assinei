@@ -17,6 +17,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Assinei — Suas assinaturas, sob controle.",
   description: "Rastreador pessoal de assinaturas",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Assinei",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

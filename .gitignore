@@ -43,5 +43,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# next-pwa generated files
+public/sw.js
+public/workbox-*.js
+public/sw.js.map
+public/workbox-*.js.map
+
 # other folders
-docs/
+# docs/
