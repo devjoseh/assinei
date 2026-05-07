@@ -40,10 +40,12 @@ export async function GET() {
 
     const upcomingPayments = subs
       .map((s) => {
-        const date = new Date(s.nextPaymentDate)
+        const datePart = String(s.nextPaymentDate).split("T")[0]
+        const [y, m, d] = datePart.split("-").map(Number)
+        const date = new Date(y, m - 1, d)
         date.setHours(0, 0, 0, 0)
         const daysUntil = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-        return { name: s.name, date: s.nextPaymentDate, daysUntil, price: s.price }
+        return { name: s.name, date: datePart, daysUntil, price: s.price }
       })
       .filter((s) => s.daysUntil >= 0 && s.daysUntil <= 30)
       .sort((a, b) => a.daysUntil - b.daysUntil)

@@ -88,15 +88,15 @@ export function SubscriptionForm({ open, subscription, onClose, onSave }: Subscr
     const priceInCents = Math.round(parseFloat(form.priceStr.replace(",", ".")) * 100)
     const payload = {
       name: form.name,
-      description: form.description || undefined,
+      description: form.description,
       price: isNaN(priceInCents) ? 0 : priceInCents,
       billingCycle: form.billingCycle,
       nextPaymentDate: form.nextPaymentDate,
       category: form.category,
       imageUrl: form.imageUrl || undefined,
       color: form.color,
-      notes: form.notes || undefined,
-      tags: form.tags.length > 0 ? form.tags : undefined,
+      notes: form.notes,
+      tags: form.tags,
       isActive: subscription?.isActive ?? true,
     }
 

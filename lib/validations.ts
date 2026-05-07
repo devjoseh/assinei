@@ -2,7 +2,7 @@ import { z } from "zod"
 
 export const subscriptionSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório").max(100),
-  description: z.string().max(500).optional(),
+  description: z.string().max(500).optional().or(z.literal("")),
   price: z
     .number({ message: "Preço inválido" })
     .int()
@@ -16,7 +16,7 @@ export const subscriptionSchema = z.object({
     .regex(/^#[0-9A-Fa-f]{6}$/, "Cor inválida")
     .optional(),
   isActive: z.boolean().optional().default(true),
-  notes: z.string().max(1000).optional(),
+  notes: z.string().max(1000).optional().or(z.literal("")),
   tags: z
     .array(z.string().max(30).transform((t) => t.trim().toLowerCase()))
     .max(10)
