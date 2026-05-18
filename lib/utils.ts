@@ -48,7 +48,7 @@ export function getInitials(name: string): string {
 /** Parse a date string (ISO or YYYY-MM-DD) or Date object as a local calendar date, ignoring timezone offset. */
 export function parseDate(dateStr: string | Date): Date {
   if (dateStr instanceof Date) {
-    return new Date(dateStr.getFullYear(), dateStr.getMonth(), dateStr.getDate())
+    return new Date(dateStr.getUTCFullYear(), dateStr.getUTCMonth(), dateStr.getUTCDate())
   }
   const datePart = dateStr.split("T")[0]
   const [year, month, day] = datePart.split("-").map(Number)

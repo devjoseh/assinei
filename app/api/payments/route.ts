@@ -42,6 +42,10 @@ export async function GET(req: NextRequest) {
         _id: p._id.toString(),
         userId: p.userId.toString(),
         subscriptionId: p.subscriptionId.toString(),
+        paidAt:
+          p.paidAt instanceof Date
+            ? `${p.paidAt.getUTCFullYear()}-${String(p.paidAt.getUTCMonth() + 1).padStart(2, "0")}-${String(p.paidAt.getUTCDate()).padStart(2, "0")}`
+            : p.paidAt,
       }))
     )
   } catch (e) {
@@ -80,13 +84,14 @@ export async function POST(req: NextRequest) {
     }
 
     const now = new Date()
+    const [py, pm, pd] = paidAt.split("-").map(Number)
     const doc = {
       userId: new ObjectId(session.user.id),
       subscriptionId: new ObjectId(subscriptionId),
       subscriptionName: sub.name as string,
       amount: sub.price as number,
       billingCycle: sub.billingCycle as string,
-      paidAt: parseDate(paidAt),
+      paidAt: new Date(Date.UTC(py, pm - 1, pd)),
       ...(notes ? { notes } : {}),
       createdAt: now,
     }
@@ -95,11 +100,11 @@ export async function POST(req: NextRequest) {
 
     const currentDate = parseDate(sub.nextPaymentDate)
     const nextDate = addBillingCycle(currentDate, sub.billingCycle as BillingCycle)
-    const nextDateStr = nextDate.toISOString().split("T")[0]
+    const nextPaymentDate = new Date(Date.UTC(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate()))
 
     await db.collection("subscriptions").updateOne(
       { _id: new ObjectId(subscriptionId) },
-      { $set: { nextPaymentDate: nextDateStr, updatedAt: new Date().toISOString() } }
+      { $set: { nextPaymentDate, updatedAt: new Date() } }
     )
 
     return NextResponse.json(
