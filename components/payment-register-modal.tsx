@@ -18,9 +18,10 @@ import { toast } from "sonner"
 interface PaymentRegisterModalProps {
   subscription: Subscription | null
   onClose: () => void
+  onSuccess?: () => void
 }
 
-export function PaymentRegisterModal({ subscription, onClose }: PaymentRegisterModalProps) {
+export function PaymentRegisterModal({ subscription, onClose, onSuccess }: PaymentRegisterModalProps) {
   const [paidAt, setPaidAt] = useState("")
   const [notes, setNotes] = useState("")
   const [loading, setLoading] = useState(false)
@@ -49,6 +50,7 @@ export function PaymentRegisterModal({ subscription, onClose }: PaymentRegisterM
       })
       if (!res.ok) throw new Error()
       toast.success("Pagamento registrado!")
+      onSuccess?.()
       onClose()
     } catch {
       toast.error("Erro ao registrar pagamento.")

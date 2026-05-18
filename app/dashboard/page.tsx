@@ -61,7 +61,7 @@ export default function DashboardPage() {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const { categories: allCategories } = useCategories()
 
-  const { subscriptions, allSubscriptions, loading, createSubscription, updateSubscription, deleteSubscription, toggleActive } =
+  const { subscriptions, allSubscriptions, loading, refetch, createSubscription, updateSubscription, deleteSubscription, toggleActive } =
     useSubscriptions({ search, categories, tags: selectedTags, sort })
   const { stats, loading: statsLoading, refetch: refetchStats } = useStats()
 
@@ -368,6 +368,7 @@ export default function DashboardPage() {
       <PaymentRegisterModal
         subscription={paymentSub}
         onClose={() => setPaymentSub(null)}
+        onSuccess={() => { refetch(); refetchStats() }}
       />
 
       <PaymentHistoryDrawer

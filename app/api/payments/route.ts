@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
       subscriptionName: sub.name as string,
       amount: sub.price as number,
       billingCycle: sub.billingCycle as string,
-      paidAt: new Date(paidAt),
+      paidAt: parseDate(paidAt),
       ...(notes ? { notes } : {}),
       createdAt: now,
     }
