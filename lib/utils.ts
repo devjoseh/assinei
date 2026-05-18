@@ -52,6 +52,28 @@ export function parseDate(dateStr: string): Date {
   return new Date(year, month - 1, day)
 }
 
+export function addBillingCycle(date: Date, cycle: BillingCycle): Date {
+  const d = new Date(date)
+  switch (cycle) {
+    case "weekly":
+      d.setDate(d.getDate() + 7)
+      break
+    case "monthly":
+      d.setMonth(d.getMonth() + 1)
+      break
+    case "quarterly":
+      d.setMonth(d.getMonth() + 3)
+      break
+    case "semiannual":
+      d.setMonth(d.getMonth() + 6)
+      break
+    case "annual":
+      d.setFullYear(d.getFullYear() + 1)
+      break
+  }
+  return d
+}
+
 export function getDaysUntil(dateStr: string): number {
   const target = parseDate(dateStr)
   const now = new Date()

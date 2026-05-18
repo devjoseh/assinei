@@ -13,7 +13,9 @@
       "Bash(npm list *)",
       "Bash(node *)",
       "Bash(npm run *)",
-      "Bash(file public/icons/*.png)"
+      "Bash(file public/icons/*.png)",
+      "Bash(Select-Object -First 20)",
+      "PowerShell(npx tsc --noEmit 2>&1 | Select-Object -First 20)"
     ]
   }
 }

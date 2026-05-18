@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth"
 import { getDb } from "@/lib/mongodb"
+import { addBillingCycle, parseDate } from "@/lib/utils"
 import { paymentSchema } from "@/lib/validations"
+import { BillingCycle } from "@/types"
 import { ObjectId } from "mongodb"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -89,6 +91,16 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await db.collection("payments").insertOne(doc)
+
+    const currentDate = parseDate(sub.nextPaymentDate as string)
+    const nextDate = addBillingCycle(currentDate, sub.billingCycle as BillingCycle)
+    const nextDateStr = nextDate.toISOString().split("T")[0]
+
+    await db.collection("subscriptions").updateOne(
+      { _id: new ObjectId(subscriptionId) },
+      { $set: { nextPaymentDate: nextDateStr, updatedAt: new Date().toISOString() } }
+    )
+
     return NextResponse.json(
       {
         ...doc,
