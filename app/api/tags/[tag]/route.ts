@@ -19,7 +19,8 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
       tag: decodeURIComponent(tag),
     })
     return NextResponse.json({ success: true })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("DELETE /api/tags/[tag] error:", e)
+    return NextResponse.json({ error: "Erro ao excluir tag" }, { status: 500 })
   }
 }

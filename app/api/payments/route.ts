@@ -44,8 +44,9 @@ export async function GET(req: NextRequest) {
         subscriptionId: p.subscriptionId.toString(),
       }))
     )
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("GET /api/payments error:", e)
+    return NextResponse.json({ error: "Erro ao buscar pagamentos" }, { status: 500 })
   }
 }
 
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
 
     const result = await db.collection("payments").insertOne(doc)
 
-    const currentDate = parseDate(sub.nextPaymentDate as string)
+    const currentDate = parseDate(sub.nextPaymentDate)
     const nextDate = addBillingCycle(currentDate, sub.billingCycle as BillingCycle)
     const nextDateStr = nextDate.toISOString().split("T")[0]
 
@@ -110,7 +111,8 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     )
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("POST /api/payments error:", e)
+    return NextResponse.json({ error: "Erro ao registrar pagamento" }, { status: 500 })
   }
 }

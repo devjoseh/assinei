@@ -43,7 +43,8 @@ export async function PATCH(req: NextRequest) {
         userId: c.userId.toString(),
       }))
     )
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("POST /api/categories/reorder error:", e)
+    return NextResponse.json({ error: "Erro ao reordenar categorias" }, { status: 500 })
   }
 }

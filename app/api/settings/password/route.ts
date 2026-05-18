@@ -41,7 +41,8 @@ export async function PATCH(req: Request) {
     )
 
     return NextResponse.json({ success: true })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("PATCH /api/settings/password error:", e)
+    return NextResponse.json({ error: "Erro ao alterar senha" }, { status: 500 })
   }
 }

@@ -23,7 +23,8 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
 
     if (result.deletedCount === 0) return NextResponse.json({ error: "Não encontrado" }, { status: 404 })
     return NextResponse.json({ success: true })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("DELETE /api/image-history/[id] error:", e)
+    return NextResponse.json({ error: "Erro ao excluir imagem" }, { status: 500 })
   }
 }

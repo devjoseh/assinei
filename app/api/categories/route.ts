@@ -25,8 +25,9 @@ export async function GET() {
         userId: c.userId.toString(),
       }))
     )
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("GET /api/categories error:", e)
+    return NextResponse.json({ error: "Erro ao buscar categorias" }, { status: 500 })
   }
 }
 
@@ -92,7 +93,8 @@ export async function POST(req: NextRequest) {
       { ...doc, _id: result.insertedId.toString(), userId: session.user.id },
       { status: 201 }
     )
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("POST /api/categories error:", e)
+    return NextResponse.json({ error: "Erro ao criar categoria" }, { status: 500 })
   }
 }

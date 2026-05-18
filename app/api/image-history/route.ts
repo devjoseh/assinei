@@ -22,8 +22,9 @@ export async function GET() {
     return NextResponse.json(
       history.map((h) => ({ ...h, _id: h._id.toString(), userId: h.userId.toString() }))
     )
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("GET /api/image-history error:", e)
+    return NextResponse.json({ error: "Erro ao buscar histórico de imagens" }, { status: 500 })
   }
 }
 
@@ -60,7 +61,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ...result, _id: result._id.toString(), userId: result.userId.toString() })
     }
     return NextResponse.json({ success: true }, { status: 201 })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("POST /api/image-history error:", e)
+    return NextResponse.json({ error: "Erro ao salvar imagem" }, { status: 500 })
   }
 }

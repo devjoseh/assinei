@@ -45,8 +45,11 @@ export function getInitials(name: string): string {
     .toUpperCase()
 }
 
-/** Parse a date string (ISO or YYYY-MM-DD) as a local calendar date, ignoring timezone offset. */
-export function parseDate(dateStr: string): Date {
+/** Parse a date string (ISO or YYYY-MM-DD) or Date object as a local calendar date, ignoring timezone offset. */
+export function parseDate(dateStr: string | Date): Date {
+  if (dateStr instanceof Date) {
+    return new Date(dateStr.getFullYear(), dateStr.getMonth(), dateStr.getDate())
+  }
   const datePart = dateStr.split("T")[0]
   const [year, month, day] = datePart.split("-").map(Number)
   return new Date(year, month - 1, day)

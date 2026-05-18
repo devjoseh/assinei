@@ -65,7 +65,8 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ months })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("GET /api/payments/summary error:", e)
+    return NextResponse.json({ error: "Erro ao carregar resumo" }, { status: 500 })
   }
 }

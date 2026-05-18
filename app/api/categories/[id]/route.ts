@@ -67,8 +67,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       _id: result._id.toString(),
       userId: result.userId.toString(),
     })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("PATCH /api/categories/[id] error:", e)
+    return NextResponse.json({ error: "Erro ao atualizar categoria" }, { status: 500 })
   }
 }
 
@@ -115,7 +116,8 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
       success: true,
       movedSubscriptions: updatedSubs.modifiedCount,
     })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("DELETE /api/categories/[id] error:", e)
+    return NextResponse.json({ error: "Erro ao excluir categoria" }, { status: 500 })
   }
 }

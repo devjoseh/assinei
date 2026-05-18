@@ -33,8 +33,9 @@ export async function GET() {
       _id: doc._id.toString(),
       userId: doc.userId.toString(),
     })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("GET /api/settings/alerts error:", e)
+    return NextResponse.json({ error: "Erro ao buscar configurações de alerta" }, { status: 500 })
   }
 }
 
@@ -70,7 +71,8 @@ export async function PATCH(req: NextRequest) {
       _id: result._id.toString(),
       userId: result.userId.toString(),
     })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("PATCH /api/settings/alerts error:", e)
+    return NextResponse.json({ error: "Erro ao salvar configurações de alerta" }, { status: 500 })
   }
 }

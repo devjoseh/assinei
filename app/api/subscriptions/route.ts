@@ -34,8 +34,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       subscriptions.map((s) => ({ ...s, _id: s._id.toString(), userId: s.userId.toString() }))
     )
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("GET /api/subscriptions error:", e)
+    return NextResponse.json({ error: "Erro ao buscar assinaturas" }, { status: 500 })
   }
 }
 
@@ -74,7 +75,8 @@ export async function POST(req: NextRequest) {
       { ...doc, _id: result.insertedId.toString(), userId: doc.userId.toString() },
       { status: 201 }
     )
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("POST /api/subscriptions error:", e)
+    return NextResponse.json({ error: "Erro ao criar assinatura" }, { status: 500 })
   }
 }

@@ -25,8 +25,9 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
     if (!sub) return NextResponse.json({ error: "Não encontrado" }, { status: 404 })
     return NextResponse.json({ ...sub, _id: sub._id.toString(), userId: sub.userId.toString() })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("GET /api/subscriptions/[id] error:", e)
+    return NextResponse.json({ error: "Erro ao buscar assinatura" }, { status: 500 })
   }
 }
 
@@ -73,8 +74,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     if (!result) return NextResponse.json({ error: "Não encontrado" }, { status: 404 })
 
     return NextResponse.json({ ...result, _id: result._id.toString(), userId: result.userId.toString() })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("PATCH /api/subscriptions/[id] error:", e)
+    return NextResponse.json({ error: "Erro ao atualizar assinatura" }, { status: 500 })
   }
 }
 
@@ -96,7 +98,8 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
 
     if (result.deletedCount === 0) return NextResponse.json({ error: "Não encontrado" }, { status: 404 })
     return NextResponse.json({ success: true })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("DELETE /api/subscriptions/[id] error:", e)
+    return NextResponse.json({ error: "Erro ao excluir assinatura" }, { status: 500 })
   }
 }

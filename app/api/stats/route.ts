@@ -111,7 +111,8 @@ export async function GET() {
       upcomingPayments,
       categoryBreakdown,
     })
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("GET /api/stats error:", e)
+    return NextResponse.json({ error: "Erro ao carregar estatísticas" }, { status: 500 })
   }
 }

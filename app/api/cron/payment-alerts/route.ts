@@ -86,6 +86,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ sent: true, count: upcoming.length })
   } catch (err) {
     console.error("[cron/payment-alerts] error:", err)
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+    return NextResponse.json({ error: "Erro ao enviar alertas de pagamento" }, { status: 500 })
   }
 }

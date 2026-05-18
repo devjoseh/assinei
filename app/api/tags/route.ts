@@ -24,7 +24,8 @@ export async function GET() {
         userId: t.userId.toString(),
       }))
     )
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 })
+  } catch (e) {
+    console.error("GET /api/tags error:", e)
+    return NextResponse.json({ error: "Erro ao buscar tags" }, { status: 500 })
   }
 }
